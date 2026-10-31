@@ -1,0 +1,135 @@
+{
+    "master_leaderboard": [
+        {
+            "model_name": "Gaussian Naive Bayes",
+            "accuracy": 0.7225,
+            "precision": 0.6719,
+            "recall": 0.7225,
+            "weighted_f1": 0.6866,
+            "roc_auc": 0.6043,
+            "category": "Traditional"
+        },
+        {
+            "model_name": "K-Nearest Neighbors",
+            "accuracy": 0.7282,
+            "precision": 0.66,
+            "recall": 0.7282,
+            "weighted_f1": 0.6765,
+            "roc_auc": 0.5499,
+            "category": "Traditional"
+        },
+        {
+            "model_name": "Random Forest",
+            "accuracy": 0.6367,
+            "precision": 0.696,
+            "recall": 0.6367,
+            "weighted_f1": 0.6575,
+            "roc_auc": 0.6254,
+            "category": "Ensemble"
+        },
+        {
+            "model_name": "Multi-Layer Perceptron (MLP)",
+            "accuracy": 0.7572,
+            "precision": 0.6724,
+            "recall": 0.7572,
+            "weighted_f1": 0.6559,
+            "roc_auc": 0.6271,
+            "category": "Neural Network"
+        },
+        {
+            "model_name": "Bagging (Decision Trees)",
+            "accuracy": 0.6319,
+            "precision": 0.6934,
+            "recall": 0.6319,
+            "weighted_f1": 0.6534,
+            "roc_auc": 0.6227,
+            "category": "Ensemble"
+        },
+        {
+            "model_name": "Decision Tree",
+            "accuracy": 0.6291,
+            "precision": 0.6931,
+            "recall": 0.6291,
+            "weighted_f1": 0.6512,
+            "roc_auc": 0.6121,
+            "category": "Traditional"
+        },
+        {
+            "model_name": "Gradient Boosting",
+            "accuracy": 0.6148,
+            "precision": 0.6988,
+            "recall": 0.6148,
+            "weighted_f1": 0.6406,
+            "roc_auc": 0.628,
+            "category": "Ensemble"
+        },
+        {
+            "model_name": "Support Vector Machine",
+            "accuracy": 0.5864,
+            "precision": 0.6832,
+            "recall": 0.5864,
+            "weighted_f1": 0.6151,
+            "roc_auc": 0.5909,
+            "category": "Traditional"
+        },
+        {
+            "model_name": "Logistic Regression",
+            "accuracy": 0.5796,
+            "precision": 0.686,
+            "recall": 0.5796,
+            "weighted_f1": 0.6094,
+            "roc_auc": 0.5977,
+            "category": "Traditional"
+        }
+    ],
+    "best_model": {
+        "model_name": "Gaussian Naive Bayes",
+        "accuracy": 0.7225,
+        "precision": 0.6719,
+        "recall": 0.7225,
+        "weighted_f1": 0.6866,
+        "roc_auc": 0.6043,
+        "category": "Traditional"
+    },
+    "bias_variance_analysis": [
+        {
+            "model": "Logistic Regression",
+            "bias": "High",
+            "variance": "Low",
+            "risk": "Underfitting nonlinear road interactions",
+            "viva_note": "Linear decision boundary cannot capture speed x darkness interaction."
+        },
+        {
+            "model": "Decision Tree (Unpruned)",
+            "bias": "Low",
+            "variance": "High",
+            "risk": "Overfitting noise and single accidents",
+            "viva_note": "High variance mitigated by ensemble bagging."
+        },
+        {
+            "model": "Random Forest",
+            "bias": "Low",
+            "variance": "Medium-Low",
+            "risk": "Balanced",
+            "viva_note": "Averages many decorrelated trees; reduces variance substantially."
+        },
+        {
+            "model": "Gradient Boosting",
+            "bias": "Low",
+            "variance": "Low-Medium",
+            "risk": "Balanced / Overfitting if too many iterations",
+            "viva_note": "Sequential boosting reduces bias by focusing on hard-to-classify crashes."
+        },
+        {
+            "model": "Multi-Layer Perceptron (NN)",
+            "bias": "Low",
+            "variance": "Medium",
+            "risk": "Requires extensive parameter tuning",
+            "viva_note": "Approximates complex nonlinear surfaces through ReLU hidden layers."
+        }
+    ],
+    "ensemble_comparison": {
+        "bagging_vs_random_forest": "Random Forest improves on standard Bagging by introducing feature bagging (random subspace), which decorrelates individual decision trees and achieves higher generalization.",
+        "boosting_vs_bagging": "Bagging builds independent models in parallel to cut variance, while Boosting builds models sequentially to minimize residual bias."
+    }
+}

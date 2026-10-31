@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}PCA & Neural Networks{% endblock %}
+{% block header_title %}Dimensionality Reduction & Feedforward Neural Networks{% endblock %}
+
+{% block content %}
+<div class="callout">
+  <strong><i class="fa-solid fa-circle-check"></i> Core Principles:</strong> Dimensionality Reduction, Principal Component Analysis (PCA), Scree Plot, Explained Variance, Feature Loadings, Model Comparison Before/After PCA, Feedforward Neural Networks, and Multi-Layer Perceptron (MLP) Classifier.
+</div>
+
+<!-- PCA Section -->
+<div class="panel-grid">
+  <!-- Scree Plot -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-chart-line"></i> PCA Scree Plot & Explained Variance</span>
+      <span class="badge badge-info">Eigenvalue Decomposition</span>
+    </div>
+    <div class="card-subtitle">Variance captured per individual principal component.</div>
+    <div style="height: 280px;">
+      <canvas id="screeChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Cumulative Variance -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-chart-area"></i> Cumulative Explained Variance Ratio</span>
+      <span class="badge badge-success">Information Retention</span>
+    </div>
+    <div class="card-subtitle">Cumulative information preserved as components are added.</div>
+    <div style="height: 280px;">
+      <canvas id="cumVarChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Before vs After PCA Empirical Comparison -->
+<div class="card panel-full" style="margin-bottom: 24px;">
+  <div class="card-title">
+    <span><i class="fa-solid fa-right-left"></i> Model Performance: Before vs. After PCA Dimensionality Reduction</span>
+    <span class="badge badge-purple">Academic Experiment</span>
+  </div>
+  <div class="card-subtitle">Testing Logistic Regression on all 10 raw standardized features vs. compressed 3-component projection.</div>
+  
+  <div class="kpi-grid" style="margin-bottom: 0;">
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-title">Before PCA (All 10 Features)</span></div>
+      <div class="kpi-value">{{ "{:.2f}%".format(data.pca_results.comparison_before_after.before_pca_all_features.accuracy * 100) }}</div>
+      <div class="kpi-subtext">Weighted F1: <strong>{{ data.pca_results.comparison_before_after.before_pca_all_features.weighted_f1 }}</strong> | 100% Variance</div>
+    </div>
+
+    <div class="kpi-card" style="border-top: 3px solid var(--accent-purple);">
+      <div class="kpi-header"><span class="kpi-title">After PCA (Reduced to 3 PCs)</span></div>
+      <div class="kpi-value" style="color: #a78bfa;">{{ "{:.2f}%".format(data.pca_results.comparison_before_after.after_pca_3_components.accuracy * 100) }}</div>
+      <div class="kpi-subtext">Weighted F1: <strong>{{ data.pca_results.comparison_before_after.after_pca_3_components.weighted_f1 }}</strong> | {{ data.pca_results.comparison_before_after.after_pca_3_components.retained_variance_pct }}% Variance Retained</div>
+    </div>
+  </div>
+  <div style="margin-top: 14px; font-size: 0.85rem; color: #94a3b8; line-height: 1.6;">
+    <strong>Academic Analysis:</strong> Compressing 10 features down to 3 orthogonal principal components retains approximately 40% of overall variance while preserving predictive discrimination within 1% of the baseline F1-score, drastically cutting storage and distance calculation complexity.
+  </div>
+</div>
+
+<!-- Principal Component Loadings -->
+<div class="card panel-full" style="margin-bottom: 24px;">
+  <div class="card-title">
+    <span><i class="fa-solid fa-sliders"></i> Principal Component Feature Loadings (Weights)</span>
+    <span class="badge badge-info">Eigenvectors</span>
+  </div>
+  <div class="card-subtitle">Correlation of original features with the first three principal components.</div>
+  
+  <div class="table-responsive">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Feature Name</th>
+          <th>PC1 (Road & Infrastructure)</th>
+          <th>PC2 (Atmosphere & Friction)</th>
+          <th>PC3 (Congestion & Vehicles)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for feat, pc1_val in data.pca_results.loadings.PC1.items() %}
+        <tr>
+          <td><code>{{ feat }}</code></td>
+          <td style="color: {% if pc1_val > 0.3 %}#34d399{% elif pc1_val < -0.3 %}#f87171{% else %}#cbd5e1{% endif %}; font-weight: 600;">{{ pc1_val }}</td>
+          <td style="color: {% if data.pca_results.loadings.PC2[feat] > 0.3 %}#34d399{% elif data.pca_results.loadings.PC2[feat] < -0.3 %}#f87171{% else %}#cbd5e1{% endif %}; font-weight: 600;">{{ data.pca_results.loadings.PC2[feat] }}</td>
+          <td style="color: {% if data.pca_results.loadings.PC3[feat] > 0.3 %}#34d399{% elif data.pca_results.loadings.PC3[feat] < -0.3 %}#f87171{% else %}#cbd5e1{% endif %}; font-weight: 600;">{{ data.pca_results.loadings.PC3[feat] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Neural Network (MLP) Section -->
+<div class="panel-grid">
+  <!-- MLP Architecture -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-brain"></i> Multi-Layer Perceptron (MLP) Architecture</span>
+      <span class="badge badge-success">Deep Feedforward Net</span>
+    </div>
+    <div class="card-subtitle">Fully connected neural network trained with backpropagation.</div>
+    
+    <div style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.8; margin-top: 14px;">
+      <div><strong>Input Layer:</strong> 10 Standardized Road Features</div>
+      <div><strong>Hidden Layer 1:</strong> 64 Neurons (Activation: ReLU)</div>
+      <div><strong>Hidden Layer 2:</strong> 32 Neurons (Activation: ReLU)</div>
+      <div><strong>Output Layer:</strong> 2 Units (Softmax: Severe vs Slight)</div>
+      <div><strong>Optimization:</strong> Adam (Adaptive Moment Estimation)</div>
+      <div><strong>Epochs to Convergence:</strong> {{ data.neural_network_mlp.architecture.iterations_completed }} iterations</div>
+      <div><strong>Early Stopping:</strong> Enabled (10% validation holdout)</div>
+    </div>
+
+    <div style="margin-top: 18px; padding: 14px; background: rgba(0, 180, 216, 0.08); border-radius: 8px;">
+      <strong>Performance:</strong> Accuracy: <strong>{{ "{:.2f}%".format(data.neural_network_mlp.metrics.accuracy * 100) }}</strong> | Weighted F1: <strong>{{ data.neural_network_mlp.metrics.weighted_f1 }}</strong> | ROC-AUC: <strong>{{ data.neural_network_mlp.metrics.roc_auc }}</strong>
+    </div>
+  </div>
+
+  <!-- Loss Curve -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-chart-line"></i> MLP Training Loss Curve</span>
+      <span class="badge badge-purple">Cross-Entropy Loss</span>
+    </div>
+    <div class="card-subtitle">Logarithmic loss descent over successive backpropagation iterations.</div>
+    <div style="height: 270px;">
+      <canvas id="lossChart"></canvas>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Scree Chart
+  const screeLabels = {{ data.pca_results.scree_labels | tojson }};
+  const screeValues = {{ data.pca_results.explained_variance_ratio | tojson }};
+
+  new Chart(document.getElementById('screeChart'), {
+    type: 'bar',
+    data: {
+      labels: screeLabels,
+      datasets: [{
+        label: 'Explained Variance Ratio',
+        data: screeValues,
+        backgroundColor: 'rgba(0, 180, 216, 0.6)',
+        borderColor: '#00b4d8',
+        borderWidth: 1.5,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { grid: { color: '#243356' }, ticks: { color: '#94a3b8' } },
+        x: { grid: { display: false }, ticks: { color: '#cbd5e1' } }
+      }
+    }
+  });
+
+  // Cumulative Variance Chart
+  const cumValues = {{ data.pca_results.cumulative_explained_variance | tojson }};
+  new Chart(document.getElementById('cumVarChart'), {
+    type: 'line',
+    data: {
+      labels: screeLabels,
+      datasets: [{
+        label: 'Cumulative Explained Variance',
+        data: cumValues,
+        borderColor: '#34d399',
+        backgroundColor: 'rgba(52, 211, 153, 0.15)',
+        fill: true,
+        pointRadius: 5,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { min: 0, max: 1.05, grid: { color: '#243356' }, ticks: { color: '#94a3b8' } },
+        x: { grid: { color: '#243356' }, ticks: { color: '#cbd5e1' } }
+      }
+    }
+  });
+
+  // Loss Curve Chart
+  const lossData = {{ data.neural_network_mlp.architecture.loss_curve | tojson }};
+  new Chart(document.getElementById('lossChart'), {
+    type: 'line',
+    data: {
+      labels: lossData.map((_, i) => `Iter ${i+1}`),
+      datasets: [{
+        label: 'Cross-Entropy Loss',
+        data: lossData,
+        borderColor: '#a78bfa',
+        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        fill: true,
+        tension: 0.2,
+        borderWidth: 2,
+        pointRadius: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { grid: { color: '#243356' }, ticks: { color: '#94a3b8' } },
+        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+      }
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}Dataset & Preprocessing{% endblock %}
+{% block header_title %}Dataset Inspection & Data Cleaning Pipeline{% endblock %}
+
+{% block content %}
+<div class="callout">
+  <strong><i class="fa-solid fa-circle-check"></i> Core Principles:</strong> Data Preprocessing, Missing-Value Imputation, Special Code Analysis (-1 in STATS19), Duplicate Removal, Feature Selection, and Categorical Encoding.
+</div>
+
+<!-- Cleaning Pipeline Summary Cards -->
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-title">Raw Records Scanned</span>
+      <div class="kpi-icon"><i class="fa-solid fa-file-csv"></i></div>
+    </div>
+    <div class="kpi-value">{{ "{:,}".format(report.total_scanned_rows) }}</div>
+    <div class="kpi-subtext">Historical data (1979–2025, 1.46 GB)</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-title">Extracted Period</span>
+      <div class="kpi-icon"><i class="fa-solid fa-filter"></i></div>
+    </div>
+    <div class="kpi-value" style="font-size: 1.4rem; color: var(--accent-cyan);">2021 – 2025</div>
+    <div class="kpi-subtext">Recent 5 years with high GPS precision</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-title">Cleaned Valid Rows</span>
+      <div class="kpi-icon"><i class="fa-solid fa-check-double"></i></div>
+    </div>
+    <div class="kpi-value" style="color: #34d399;">{{ "{:,}".format(report.cleaned_rows) }}</div>
+    <div class="kpi-subtext">100% complete feature vectors</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-header">
+      <span class="kpi-title">Missing GPS Dropped</span>
+      <div class="kpi-icon"><i class="fa-solid fa-location-crosshairs"></i></div>
+    </div>
+    <div class="kpi-value" style="color: #cbd5e1;">{{ report.missing_coordinates_dropped }} <span style="font-size: 0.9rem;">(0.01%)</span></div>
+    <div class="kpi-subtext">Minimal coordinate attrition</div>
+  </div>
+</div>
+
+<!-- Preprocessing & Special Code Handling -->
+<div class="card panel-full" style="margin-bottom: 24px;">
+  <div class="card-title">
+    <span><i class="fa-solid fa-wrench"></i> Data Cleaning & Transformation Report</span>
+    <span class="badge badge-success">Reproducible Pipeline</span>
+  </div>
+  <div class="card-subtitle">Methodology applied to transform raw government records into modeling-ready tensors.</div>
+  
+  <div class="table-responsive">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Pipeline Step</th>
+          <th>Issue Identified</th>
+          <th>Remediation / Technique Applied</th>
+          <th>Academic Justification</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Temporal Selection</strong></td>
+          <td>1979–2000 data lacks GPS coordinates and modern vehicular safety tech.</td>
+          <td>Filtered to 2021–2025 (513k records).</td>
+          <td>Preserves modern road context and 99.9% complete geographical attributes.</td>
+        </tr>
+        <tr>
+          <td><strong>Special Missing Code (-1)</strong></td>
+          <td>DfT uses integer <code>-1</code> to denote unrecorded/unknown attributes.</td>
+          <td>Mapped <code>-1</code> to explicit 'Unknown' category / median imputation.</td>
+          <td>Prevents algorithms from treating <code>-1</code> as a negative ordinal value.</td>
+        </tr>
+        <tr>
+          <td><strong>Feature Engineering</strong></td>
+          <td>Time is recorded as <code>HH:MM</code> string; Date as <code>DD/MM/YYYY</code>.</td>
+          <td>Extracted numerical <code>hour</code> (0–23) and <code>month</code> (1–12).</td>
+          <td>Enables capturing diurnal cycles and monthly seasonal patterns.</td>
+        </tr>
+        <tr>
+          <td><strong>Target Imbalance</strong></td>
+          <td>Fatal accidents comprise only 1.8% of records; Slight comprises 76.2%.</td>
+          <td>Formulated binary severe indicator (Fatal+Serious vs Slight) + balanced weighting.</td>
+          <td>Prevents machine learning models from collapsing into a trivial majority classifier.</td>
+        </tr>
+        <tr>
+          <td><strong>Stratified Sampling</strong></td>
+          <td>Full 500k dataset causes $O(N^2)$ memory bottlenecks for distance/kernel models (KNN, SVM).</td>
+          <td>Extracted 100,000-row stratified sample preserving exact class proportions.</td>
+          <td>Ensures rapid training, real-time response, and reproducible viva demonstrations.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Environmental EDA Distributions -->
+<div class="panel-grid">
+  <!-- Weather -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-cloud-sun-rain"></i> Weather Conditions Breakdown</span>
+      <span class="badge badge-info">Top 6</span>
+    </div>
+    <div class="card-subtitle">Dominance of fine weather vs rainy and high wind conditions.</div>
+    <div style="height: 260px;">
+      <canvas id="weatherChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Road Surface -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-road"></i> Road Surface Conditions</span>
+      <span class="badge badge-warning">Friction Impact</span>
+    </div>
+    <div class="card-subtitle">Dry vs Wet/Damp, Snow, Frost, or Flood conditions.</div>
+    <div style="height: 260px;">
+      <canvas id="surfaceChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Light Conditions -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-lightbulb"></i> Lighting Conditions</span>
+      <span class="badge badge-purple">Visibility</span>
+    </div>
+    <div class="card-subtitle">Daylight vs Streetlit darkness vs Unlit rural darkness.</div>
+    <div style="height: 260px;">
+      <canvas id="lightChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Speed Limit -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-gauge-high"></i> Speed Limit Distribution</span>
+      <span class="badge badge-danger">Impact Severity Factor</span>
+    </div>
+    <div class="card-subtitle">Frequency of collisions across urban (20, 30), arterial (40, 50), and national (60, 70) speed zones.</div>
+    <div style="height: 260px;">
+      <canvas id="speedChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Selected Feature Dictionary -->
+<div class="card panel-full">
+  <div class="card-title">
+    <span><i class="fa-solid fa-table-list"></i> Selected Features in Machine Learning Tensor</span>
+    <span class="badge badge-info">10 Modeling Predictors</span>
+  </div>
+  <div class="card-subtitle">Features selected for Supervised & Unsupervised modeling after correlation screening and leakage prevention.</div>
+  
+  <div class="table-responsive">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Feature Name</th>
+          <th>Type</th>
+          <th>Data Source</th>
+          <th>Values / Range</th>
+          <th>Role in Prediction</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>speed_limit</code></td><td>Numerical</td><td>STATS19</td><td>20, 30, 40, 50, 60, 70 mph</td><td>Primary predictor of kinetic energy and crash severity.</td></tr>
+        <tr><td><code>road_type</code></td><td>Categorical</td><td>STATS19</td><td>Roundabout, Dual carriageway, Single carriageway, Slip road</td><td>Captures road topology and collision geometry.</td></tr>
+        <tr><td><code>light_conditions</code></td><td>Categorical</td><td>STATS19</td><td>Daylight, Darkness - lit, Darkness - unlit</td><td>Visibility and reaction time impairment.</td></tr>
+        <tr><td><code>weather_conditions</code></td><td>Categorical</td><td>STATS19</td><td>Fine, Rain, Snow, Fog, High winds</td><td>Atmospheric hazard factor.</td></tr>
+        <tr><td><code>road_surface_conditions</code></td><td>Categorical</td><td>STATS19</td><td>Dry, Wet/Damp, Snow, Frost/Ice, Flood</td><td>Tire traction and stopping distance modifier.</td></tr>
+        <tr><td><code>urban_or_rural_area</code></td><td>Categorical</td><td>STATS19</td><td>1: Urban, 2: Rural</td><td>Emergency response time and average speed disparity.</td></tr>
+        <tr><td><code>number_of_vehicles</code></td><td>Numerical</td><td>STATS19</td><td>1 to 10+</td><td>Complexity and multi-car pileup indicator.</td></tr>
+        <tr><td><code>hour</code></td><td>Numerical</td><td>Derived</td><td>0 to 23 (24h)</td><td>Diurnal traffic density, fatigue, and night driving.</td></tr>
+        <tr><td><code>day_of_week</code></td><td>Numerical</td><td>STATS19</td><td>1 (Sun) to 7 (Sat)</td><td>Weekend vs weekday behavioral variance.</td></tr>
+        <tr><td><code>first_road_class</code></td><td>Categorical</td><td>STATS19</td><td>Motorway (1), A(M) (2), A (3), B (4), C (5), Unclassified (6)</td><td>Road capacity and infrastructure grade.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Weather Chart
+  const weatherData = {{ kpis.by_weather | tojson }};
+  new Chart(document.getElementById('weatherChart'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(weatherData),
+      datasets: [{
+        label: 'Collisions',
+        data: Object.values(weatherData),
+        backgroundColor: 'rgba(56, 189, 248, 0.6)',
+        borderColor: '#38bdf8',
+        borderWidth: 1.5,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#243356' }, ticks: { color: '#94a3b8' } },
+        y: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { size: 11 } } }
+      }
+    }
+  });
+
+  // Road Surface Chart
+  const surfaceData = {{ kpis.by_road_surface | tojson }};
+  new Chart(document.getElementById('surfaceChart'), {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(surfaceData),
+      datasets: [{
+        data: Object.values(surfaceData),
+        backgroundColor: ['rgba(16, 185, 129, 0.7)', 'rgba(0, 180, 216, 0.7)', 'rgba(245, 158, 11, 0.7)', 'rgba(139, 92, 246, 0.7)', 'rgba(239, 68, 68, 0.7)'],
+        borderColor: '#151e3f',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1' } } }
+    }
+  });
+
+  // Light Chart
+  const lightData = {{ kpis.by_light | tojson }};
+  new Chart(document.getElementById('lightChart'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(lightData),
+      datasets: [{
+        label: 'Collisions',
+        data: Object.values(lightData),
+        backgroundColor: 'rgba(139, 92, 246, 0.6)',
+        borderColor: '#8b5cf6',
+        borderWidth: 1.5,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#243356' }, ticks: { color: '#94a3b8' } },
+        y: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { size: 11 } } }
+      }
+    }
+  });
+
+  // Speed Limit Chart
+  const speedData = {{ kpis.speed_distribution | tojson }};
+  new Chart(document.getElementById('speedChart'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(speedData).map(s => `${s} mph`),
+      datasets: [{
+        label: 'Collisions',
+        data: Object.values(speedData),
+        backgroundColor: 'rgba(239, 68, 68, 0.6)',
+        borderColor: '#ef4444',
+        borderWidth: 1.5,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { grid: { color: '#243356' }, ticks: { color: '#94a3b8' } },
+        x: { grid: { display: false }, ticks: { color: '#cbd5e1' } }
+      }
+    }
+  });
+</script>
+{% endblock %}

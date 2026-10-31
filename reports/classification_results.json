@@ -1,0 +1,178 @@
+{
+    "dataset_summary": {
+        "total_records": 99998,
+        "train_records": 79998,
+        "test_records": 20000,
+        "target": "is_severe (1 = Fatal/Serious, 0 = Slight)",
+        "features": [
+            "speed_limit",
+            "road_type",
+            "light_conditions",
+            "weather_conditions",
+            "road_surface_conditions",
+            "urban_or_rural_area",
+            "number_of_vehicles",
+            "day_of_week",
+            "hour",
+            "first_road_class"
+        ]
+    },
+    "best_model": {
+        "name": "Gaussian Naive Bayes",
+        "weighted_f1": 0.6866
+    },
+    "models": {
+        "Logistic Regression": {
+            "accuracy": 0.5796,
+            "precision": 0.686,
+            "recall": 0.5796,
+            "macro_f1": 0.5363,
+            "weighted_f1": 0.6094,
+            "roc_auc": 0.5977,
+            "log_loss": 0.6796,
+            "confusion_matrix": [
+                [
+                    8848,
+                    6311
+                ],
+                [
+                    2098,
+                    2743
+                ]
+            ]
+        },
+        "Gaussian Naive Bayes": {
+            "accuracy": 0.7225,
+            "precision": 0.6719,
+            "recall": 0.7225,
+            "macro_f1": 0.5334,
+            "weighted_f1": 0.6866,
+            "roc_auc": 0.6043,
+            "log_loss": 0.6207,
+            "confusion_matrix": [
+                [
+                    13591,
+                    1568
+                ],
+                [
+                    3982,
+                    859
+                ]
+            ]
+        },
+        "K-Nearest Neighbors": {
+            "accuracy": 0.7282,
+            "precision": 0.66,
+            "recall": 0.7282,
+            "macro_f1": 0.5049,
+            "weighted_f1": 0.6765,
+            "roc_auc": 0.5499,
+            "log_loss": 1.8295,
+            "confusion_matrix": [
+                [
+                    13999,
+                    1160
+                ],
+                [
+                    4275,
+                    566
+                ]
+            ]
+        },
+        "Decision Tree": {
+            "accuracy": 0.6291,
+            "precision": 0.6931,
+            "recall": 0.6291,
+            "macro_f1": 0.5653,
+            "weighted_f1": 0.6512,
+            "roc_auc": 0.6121,
+            "log_loss": 0.8288,
+            "confusion_matrix": [
+                [
+                    10121,
+                    5038
+                ],
+                [
+                    2380,
+                    2461
+                ]
+            ]
+        },
+        "Support Vector Machine": {
+            "accuracy": 0.5864,
+            "precision": 0.6832,
+            "recall": 0.5864,
+            "macro_f1": 0.5382,
+            "weighted_f1": 0.6151,
+            "roc_auc": 0.5909,
+            "log_loss": 0.6747,
+            "confusion_matrix": [
+                [
+                    9093,
+                    6066
+                ],
+                [
+                    2207,
+                    2634
+                ]
+            ]
+        },
+        "Random Forest": {
+            "accuracy": 0.6367,
+            "precision": 0.696,
+            "recall": 0.6367,
+            "macro_f1": 0.5709,
+            "weighted_f1": 0.6575,
+            "roc_auc": 0.6254,
+            "log_loss": 0.6529,
+            "confusion_matrix": [
+                [
+                    10282,
+                    4877
+                ],
+                [
+                    2390,
+                    2451
+                ]
+            ]
+        },
+        "Gradient Boosting": {
+            "accuracy": 0.6148,
+            "precision": 0.6988,
+            "recall": 0.6148,
+            "macro_f1": 0.5628,
+            "weighted_f1": 0.6406,
+            "roc_auc": 0.628,
+            "log_loss": 0.664,
+            "confusion_matrix": [
+                [
+                    9594,
+                    5565
+                ],
+                [
+                    2140,
+                    2701
+                ]
+            ]
+        }
+    },
+    "feature_importance": {
+        "number_of_vehicles": 0.1966,
+        "hour": 0.1593,
+        "road_type": 0.1223,
+        "speed_limit": 0.1092,
+        "day_of_week": 0.0945,
+        "weather_conditions": 0.0726,
+        "first_road_class": 0.0653,
+        "road_surface_conditions": 0.0648,
+        "urban_or_rural_area": 0.0581,
+        "light_conditions": 0.0573
+    },
+    "class_imbalance_analysis": {
+        "slight_count": 75795,
+        "severe_count": 24203,
+        "slight_ratio": 0.758,
+        "severe_ratio": 0.242,
+        "imbalance_handling_method": "class_weight='balanced' applied across estimators to penalize false negatives on rare severe crashes"
+    }
+}

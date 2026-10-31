@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Road Accident Analytics & Prediction{% endblock %} | Predictive Analytics</title>
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Custom Dark Theme CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <!-- Chart.js 4 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Leaflet Heatmap Plugin -->
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <i class="fa-solid fa-car-burst" style="font-size: 1.6rem; color: var(--accent-cyan);"></i>
+      <div>
+        <h2 style="font-size: 0.95rem; font-weight: 700; color: #fff; line-height: 1.2;">Road Accident AI</h2>
+        <span style="font-size: 0.68rem; color: var(--accent-cyan); font-weight: 600; text-transform: uppercase;">UK Collision Analytics</span>
+      </div>
+    </div>
+
+    <ul class="sidebar-menu">
+      <li class="menu-section">Main</li>
+      <li class="sidebar-item">
+        <a href="{{ url_for('page_dashboard') }}" class="sidebar-link {% if active_page == 'dashboard' %}active{% endif %}">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Project Dashboard</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="{{ url_for('page_heatmap') }}" class="sidebar-link {% if active_page == 'heatmap' %}active{% endif %}">
+          <i class="fa-solid fa-fire-flame-curved" style="color: #f97316;"></i>
+          <span>Accident Heatmap</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="{{ url_for('page_predict') }}" class="sidebar-link {% if active_page == 'predict' %}active{% endif %}">
+          <i class="fa-solid fa-calculator"></i>
+          <span>Severity Predictor</span>
+        </a>
+      </li>
+
+      <li class="menu-section">Data & Models</li>
+      <li class="sidebar-item">
+        <a href="{{ url_for('page_dataset') }}" class="sidebar-link {% if active_page == 'dataset' %}active{% endif %}">
+          <i class="fa-solid fa-database"></i>
+          <span>Dataset & Cleaning</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="{{ url_for('page_regression') }}" class="sidebar-link {% if active_page == 'regression' %}active{% endif %}">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Monthly Trends</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="{{ url_for('page_classification') }}" class="sidebar-link {% if active_page == 'classification' %}active{% endif %}">
+          <i class="fa-solid fa-tags"></i>
+          <span>Model Benchmarks</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="{{ url_for('page_clustering') }}" class="sidebar-link {% if active_page == 'clustering' %}active{% endif %}">
+          <i class="fa-solid fa-cubes"></i>
+          <span>Accident Patterns</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="{{ url_for('page_pca_nn') }}" class="sidebar-link {% if active_page == 'pca-nn' %}active{% endif %}">
+          <i class="fa-solid fa-network-wired"></i>
+          <span>PCA & Neural Net</span>
+        </a>
+      </li>
+      <li class="sidebar-item">
+        <a href="{{ url_for('page_model_comparison') }}" class="sidebar-link {% if active_page == 'model-comparison' %}active{% endif %}">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Algorithm Comparison</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div><strong>UK DfT STATS19 Data</strong></div>
+      <div>2021 – 2025 Validated</div>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    <!-- Topbar Header -->
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1>{% block header_title %}Road Accident Prediction & Analytics{% endblock %}</h1>
+      </div>
+      <div class="topbar-badges">
+        <div class="badge-tag live">Backend Active</div>
+        <div class="badge-tag"><i class="fa-solid fa-server"></i> Flask 3.1 + Scikit-Learn</div>
+        <div class="badge-tag"><i class="fa-solid fa-clock"></i> 2021–2025 (513k Records)</div>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <main class="content-body">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

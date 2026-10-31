@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Classification Analysis{% endblock %}
+{% block header_title %}Supervised Learning — Crash Severity Classification{% endblock %}
+
+{% block content %}
+<div class="callout">
+  <strong><i class="fa-solid fa-circle-check"></i> Core Principles:</strong> Logistic Regression, K-Nearest Neighbors, Naive Bayes, Decision Trees, Support Vector Machine, Random Forest, Boosting, Accuracy, Precision, Recall, F1-Score, Confusion Matrix, ROC-AUC, and Class Imbalance Resolution.
+</div>
+
+<!-- Class Imbalance & Formulation Card -->
+<div class="card panel-full" style="margin-bottom: 24px; border-left: 4px solid var(--accent-amber);">
+  <div class="card-title">
+    <span><i class="fa-solid fa-scale-unbalanced"></i> Target Variable & Class Imbalance Analysis</span>
+    <span class="badge badge-warning">Critical Machine Learning Concept</span>
+  </div>
+  <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.6;">
+    Target formulation: <strong>Accident Severity</strong> mapped into binary risk for emergency resource dispatch:
+    <strong>Severe (Fatal + Serious = 1)</strong> vs. <strong>Slight (Minor = 0)</strong>.<br/>
+    The real-world UK distribution is heavily imbalanced: <strong>Slight crashes comprise ~75.8%</strong> while <strong>Severe crashes comprise ~24.2%</strong>. A naive trivial model predicting "Slight" for every row would achieve 75.8% accuracy while failing 100% of severe injuries. Hence, models are evaluated on <strong>Weighted & Macro F1-score and ROC-AUC</strong> with <code>class_weight='balanced'</code> penalty matrices.
+  </p>
+</div>
+
+<!-- Classification Leaderboard Table -->
+<div class="card panel-full" style="margin-bottom: 24px;">
+  <div class="card-title">
+    <span><i class="fa-solid fa-table"></i> Supervised Classification Model Benchmark (Unit III)</span>
+    <span class="badge badge-info">20% Holdout Test Set (20,000 Verified Cases)</span>
+  </div>
+  <div class="card-subtitle">Comprehensive comparative matrix evaluated across all standard academic metrics.</div>
+  
+  <div class="table-responsive">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Algorithm</th>
+          <th>Accuracy</th>
+          <th>Precision (W)</th>
+          <th>Recall (W)</th>
+          <th>Macro F1</th>
+          <th>Weighted F1</th>
+          <th>ROC-AUC</th>
+          <th>Academic Takeaway</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for name, m in data.models.items() %}
+        <tr>
+          <td>
+            <strong>{{ name }}</strong>
+            {% if name == 'Random Forest' %}<span class="badge badge-success" style="margin-left: 6px;">Top Tree Ensemble</span>
+            {% elif name == 'Gaussian Naive Bayes' %}<span class="badge badge-info" style="margin-left: 6px;">Probabilistic</span>
+            {% elif name == 'Logistic Regression' %}<span class="badge badge-purple" style="margin-left: 6px;">Linear Baseline</span>{% endif %}
+          </td>
+          <td>{{ "{:.2f}%".format(m.accuracy * 100) }}</td>
+          <td>{{ m.precision }}</td>
+          <td>{{ m.recall }}</td>
+          <td>{{ m.macro_f1 }}</td>
+          <td><strong>{{ m.weighted_f1 }}</strong></td>
+          <td>
+            {% if m.roc_auc %}
+              <span class="badge badge-info">{{ m.roc_auc }}</span>
+            {% else %}
+              <span style="color: #64748b;">N/A</span>
+            {% endif %}
+          </td>
+          <td style="font-size: 0.8rem; color: #94a3b8;">
+            {% if name == 'Logistic Regression' %}Linear log-odds boundary with balanced penalization; high recall on rare severe accidents.
+            {% elif name == 'Gaussian Naive Bayes' %}Strong probabilistic prior assumption ($P(X|Y)$ independence); rapid execution.
+            {% elif name == 'K-Nearest Neighbors' %}Non-parametric metric distance clustering; computationally sensitive in high dimensions.
+            {% elif name == 'Decision Tree' %}Hierarchical orthogonal feature partitioning; susceptible to single-tree variance.
+            {% elif name == 'Support Vector Machine' %}Maximum margin hyperplane separation using stochastic gradient loss.
+            {% elif name == 'Random Forest' %}Aggregated bagging of 100 decorrelated trees; highest generalization and ROC-AUC.
+            {% elif name == 'Gradient Boosting' %}Sequential error correction minimizing residual log-loss across trees.{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Charts Section: ROC-AUC Comparison & Confusion Matrix Visualizer -->
+<div class="panel-grid">
+  <!-- ROC-AUC Comparison Chart -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-chart-column"></i> Model Discriminative Power: ROC-AUC</span>
+      <span class="badge badge-info">Area Under ROC Curve</span>
+    </div>
+    <div class="card-subtitle">Measures model separation capability between Severe and Slight incidents.</div>
+    <div style="height: 300px;">
+      <canvas id="rocChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Interactive Confusion Matrix View -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-border-all"></i> Confusion Matrix: Random Forest Classifier</span>
+      <span class="badge badge-success">20,000 Test Incidents</span>
+    </div>
+    <div class="card-subtitle">Actual Ground Truth vs Model Predictions on Test Partition.</div>
+    
+    {% set cm = data.models['Random Forest']['confusion_matrix'] %}
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;">
+      <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 18px; text-align: center;">
+        <span style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">True Negatives (TN)</span>
+        <div style="font-size: 1.6rem; font-weight: 700; color: #34d399; margin: 4px 0;">{{ "{:,}".format(cm[0][0]) }}</div>
+        <span style="font-size: 0.78rem; color: #94a3b8;">Predicted Slight & Was Slight</span>
+      </div>
+
+      <div style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 18px; text-align: center;">
+        <span style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">False Positives (FP)</span>
+        <div style="font-size: 1.6rem; font-weight: 700; color: #f87171; margin: 4px 0;">{{ "{:,}".format(cm[0][1]) }}</div>
+        <span style="font-size: 0.78rem; color: #94a3b8;">Predicted Severe but Was Slight</span>
+      </div>
+
+      <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 18px; text-align: center;">
+        <span style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">False Negatives (FN)</span>
+        <div style="font-size: 1.6rem; font-weight: 700; color: #fbbf24; margin: 4px 0;">{{ "{:,}".format(cm[1][0]) }}</div>
+        <span style="font-size: 0.78rem; color: #94a3b8;">Predicted Slight but Was Severe</span>
+      </div>
+
+      <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 18px; text-align: center;">
+        <span style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;">True Positives (TP)</span>
+        <div style="font-size: 1.6rem; font-weight: 700; color: #34d399; margin: 4px 0;">{{ "{:,}".format(cm[1][1]) }}</div>
+        <span style="font-size: 0.78rem; color: #94a3b8;">Predicted Severe & Was Severe</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // ROC-AUC Comparison Chart
+  const modelsData = {{ data.models | tojson }};
+  const modelNames = Object.keys(modelsData).filter(k => modelsData[k].roc_auc !== null);
+  const aucValues = modelNames.map(k => modelsData[k].roc_auc);
+
+  new Chart(document.getElementById('rocChart'), {
+    type: 'bar',
+    data: {
+      labels: modelNames,
+      datasets: [{
+        label: 'ROC-AUC Score',
+        data: aucValues,
+        backgroundColor: [
+          'rgba(56, 189, 248, 0.6)',
+          'rgba(0, 180, 216, 0.6)',
+          'rgba(139, 92, 246, 0.6)',
+          'rgba(245, 158, 11, 0.6)',
+          'rgba(59, 130, 246, 0.6)',
+          'rgba(16, 185, 129, 0.7)',
+          'rgba(16, 185, 129, 0.9)'
+        ],
+        borderColor: '#151e3f',
+        borderWidth: 1.5,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { min: 0.5, max: 0.7, grid: { color: '#243356' }, ticks: { color: '#94a3b8' } },
+        y: { grid: { display: false }, ticks: { color: '#cbd5e1' } }
+      }
+    }
+  });
+</script>
+{% endblock %}

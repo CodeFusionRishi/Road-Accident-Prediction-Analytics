@@ -1,0 +1,99 @@
+{
+    "total_accidents": 513748,
+    "total_casualties": 652763,
+    "total_vehicles": 937164,
+    "fatal_count": 7552,
+    "serious_count": 116797,
+    "slight_count": 389399,
+    "fatal_pct": 1.47,
+    "serious_pct": 22.73,
+    "slight_pct": 75.8,
+    "start_year": 2021,
+    "end_year": 2025,
+    "yearly_trend": {
+        "2021": 101070,
+        "2022": 105982,
+        "2023": 104246,
+        "2024": 100927,
+        "2025": 101523
+    },
+    "by_day_of_week": {
+        "Friday": 85307,
+        "Thursday": 77939,
+        "Wednesday": 76663,
+        "Tuesday": 74820,
+        "Monday": 70671,
+        "Saturday": 70572,
+        "Sunday": 57776
+    },
+    "by_hour": {
+        "0": 8109,
+        "1": 5610,
+        "2": 4106,
+        "3": 3424,
+        "4": 3138,
+        "5": 4798,
+        "6": 9561,
+        "7": 20610,
+        "8": 32854,
+        "9": 22521,
+        "10": 22556,
+        "11": 26023,
+        "12": 29670,
+        "13": 30816,
+        "14": 32950,
+        "15": 42205,
+        "16": 42895,
+        "17": 44786,
+        "18": 35932,
+        "19": 27842,
+        "20": 20488,
+        "21": 16901,
+        "22": 14649,
+        "23": 11304
+    },
+    "by_weather": {
+        "Fine no high winds": 413589,
+        "Raining no high winds": 55828,
+        "Other": 15954,
+        "Unknown": 14577,
+        "Raining + high winds": 5172,
+        "Fine + high winds": 4472
+    },
+    "by_light": {
+        "Daylight": 368154,
+        "Darkness - lights lit": 105824,
+        "Darkness - no lighting": 27435,
+        "Darkness - lighting unknown": 8595,
+        "Darkness - lights unlit": 3706,
+        "Unknown": 34
+    },
+    "by_road_surface": {
+        "Dry": 374231,
+        "Wet or damp": 120558,
+        "Unknown": 10248,
+        "Frost or ice": 6668,
+        "Snow": 1255
+    },
+    "by_road_type": {
+        "Single carriageway": 373025,
+        "Dual carriageway": 76111,
+        "Roundabout": 31175,
+        "Unknown": 13058,
+        "One way street": 11550
+    },
+    "by_area": {
+        "Urban": 345314,
+        "Rural": 168429,
+        "Unknown": 5
+    },
+    "speed_distribution": {
+        "-1.0": 3,
+        "20.0": 88088,
+        "30.0": 267299,
+        "40.0": 44745,
+        "50.0": 22665,
+        "60.0": 62693,
+        "70.0": 28255
+    }
+}

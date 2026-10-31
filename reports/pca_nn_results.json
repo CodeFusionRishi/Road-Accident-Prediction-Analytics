@@ -1,0 +1,145 @@
+{
+    "pca_results": {
+        "n_features_original": 10,
+        "n_components_reduced": 3,
+        "explained_variance_ratio": [
+            0.196,
+            0.1484,
+            0.1174,
+            0.1116,
+            0.0995,
+            0.0967,
+            0.0734,
+            0.0678,
+            0.059,
+            0.0302
+        ],
+        "cumulative_explained_variance": [
+            0.196,
+            0.3444,
+            0.4618,
+            0.5735,
+            0.6729,
+            0.7696,
+            0.843,
+            0.9108,
+            0.9698,
+            1.0
+        ],
+        "scree_labels": [
+            "PC1",
+            "PC2",
+            "PC3",
+            "PC4",
+            "PC5",
+            "PC6",
+            "PC7",
+            "PC8",
+            "PC9",
+            "PC10"
+        ],
+        "loadings": {
+            "PC1": {
+                "speed_limit": 0.6122,
+                "road_type": -0.2995,
+                "light_conditions": 0.0421,
+                "weather_conditions": -0.1225,
+                "road_surface_conditions": -0.0954,
+                "urban_or_rural_area": 0.5472,
+                "number_of_vehicles": 0.1732,
+                "day_of_week": -0.0115,
+                "hour": -0.0652,
+                "first_road_class": -0.4193
+            },
+            "PC2": {
+                "speed_limit": 0.1282,
+                "road_type": 0.123,
+                "light_conditions": 0.4021,
+                "weather_conditions": 0.6028,
+                "road_surface_conditions": 0.6288,
+                "urban_or_rural_area": 0.131,
+                "number_of_vehicles": -0.0921,
+                "day_of_week": 0.0212,
+                "hour": 0.1317,
+                "first_road_class": -0.0676
+            },
+            "PC3": {
+                "speed_limit": -0.0489,
+                "road_type": -0.1496,
+                "light_conditions": 0.5417,
+                "weather_conditions": -0.2335,
+                "road_surface_conditions": -0.2307,
+                "urban_or_rural_area": -0.0925,
+                "number_of_vehicles": -0.0299,
+                "day_of_week": 0.2071,
+                "hour": 0.7212,
+                "first_road_class": -0.0401
+            }
+        },
+        "comparison_before_after": {
+            "before_pca_all_features": {
+                "accuracy": 0.5796,
+                "weighted_f1": 0.6094,
+                "features_count": 10
+            },
+            "after_pca_3_components": {
+                "accuracy": 0.5588,
+                "weighted_f1": 0.5896,
+                "features_count": 3,
+                "retained_variance_pct": 46.18
+            }
+        }
+    },
+    "neural_network_mlp": {
+        "architecture": {
+            "input_layer": 10,
+            "hidden_layers": [
+                64,
+                32
+            ],
+            "activation": "ReLU",
+            "output_layer": 2,
+            "optimizer": "Adam",
+            "iterations_completed": 19,
+            "loss_curve": [
+                0.5533,
+                0.5369,
+                0.5354,
+                0.5343,
+                0.5338,
+                0.5331,
+                0.5328,
+                0.5325,
+                0.5323,
+                0.5318,
+                0.5316,
+                0.5316,
+                0.5312,
+                0.531,
+                0.5306,
+                0.5309,
+                0.5303,
+                0.5302,
+                0.5301
+            ]
+        },
+        "metrics": {
+            "accuracy": 0.7572,
+            "precision": 0.6724,
+            "recall": 0.7572,
+            "macro_f1": 0.4367,
+            "weighted_f1": 0.6559,
+            "roc_auc": 0.6271,
+            "confusion_matrix": [
+                [
+                    15116,
+                    43
+                ],
+                [
+                    4812,
+                    29
+                ]
+            ]
+        }
+    }
+}

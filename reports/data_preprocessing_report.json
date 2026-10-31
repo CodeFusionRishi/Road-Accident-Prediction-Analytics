@@ -1,0 +1,58 @@
+{
+    "raw_dataset_path": "D:\\predictive analytics project\\dft-road-casualty-statistics-collision-1979-latest-published-year.csv",
+    "selected_years": "2021 - 2025",
+    "total_scanned_rows": 9116625,
+    "total_extracted_rows": 513801,
+    "cleaned_rows": 513748,
+    "removed_duplicates": 0,
+    "missing_coordinates_dropped": 53,
+    "columns_count": 30,
+    "features": [
+        "collision_index",
+        "collision_year",
+        "longitude",
+        "latitude",
+        "collision_severity",
+        "number_of_vehicles",
+        "number_of_casualties",
+        "date",
+        "day_of_week",
+        "time",
+        "local_authority_ons_district",
+        "first_road_class",
+        "road_type",
+        "speed_limit",
+        "junction_detail",
+        "light_conditions",
+        "weather_conditions",
+        "road_surface_conditions",
+        "urban_or_rural_area",
+        "date_dt",
+        "month",
+        "hour",
+        "severity_label",
+        "weather_label",
+        "light_label",
+        "surface_label",
+        "road_type_label",
+        "area_label",
+        "day_name",
+        "is_severe"
+    ],
+    "severity_distribution": {
+        "Slight": 389399,
+        "Serious": 116797,
+        "Fatal": 7552
+    },
+    "severe_binary_distribution": {
+        "Slight (0)": 389399,
+        "Severe (Fatal/Serious, 1)": 124349
+    },
+    "yearly_distribution": {
+        "2021": 101070,
+        "2022": 105982,
+        "2023": 104246,
+        "2024": 100927,
+        "2025": 101523
+    }
+}

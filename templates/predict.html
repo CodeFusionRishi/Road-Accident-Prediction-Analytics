@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}Live Accident Severity Predictor{% endblock %}
+{% block header_title %}Interactive Accident Severity Prediction System{% endblock %}
+
+{% block content %}
+<div class="callout">
+  <strong><i class="fa-solid fa-calculator"></i> Real-Time Machine Learning Inference:</strong> Enter custom environmental conditions, road geometry, and temporal factors below. The input vector is preprocessed and submitted to the trained <strong>Random Forest Classifier</strong> via the Flask REST API (<code>POST /api/predict</code>), returning the predicted severity probability in real time.
+</div>
+
+<div class="panel-grid">
+  <!-- Input Form -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-sliders"></i> Scenario Input Parameters</span>
+      <span class="badge badge-info">10 Road Predictors</span>
+    </div>
+    <div class="card-subtitle">Configure the simulated road scenario to compute statistical injury risk.</div>
+
+    <form id="predictionForm">
+      <div class="form-grid">
+        <!-- Speed Limit -->
+        <div class="form-group">
+          <label class="form-label">Speed Limit (mph)</label>
+          <select class="form-select" id="speed_limit" name="speed_limit">
+            <option value="20">20 mph (Urban / Residential)</option>
+            <option value="30" selected>30 mph (Standard Urban)</option>
+            <option value="40">40 mph (Suburban Arterial)</option>
+            <option value="50">50 mph (Semi-Rural)</option>
+            <option value="60">60 mph (Single Carriageway National)</option>
+            <option value="70">70 mph (Dual Carriageway / Motorway)</option>
+          </select>
+        </div>
+
+        <!-- Road Type -->
+        <div class="form-group">
+          <label class="form-label">Road Type</label>
+          <select class="form-select" id="road_type" name="road_type">
+            <option value="6" selected>Single carriageway</option>
+            <option value="3">Dual carriageway</option>
+            <option value="1">Roundabout</option>
+            <option value="2">One way street</option>
+            <option value="7">Slip road</option>
+          </select>
+        </div>
+
+        <!-- Light Conditions -->
+        <div class="form-group">
+          <label class="form-label">Lighting Conditions</label>
+          <select class="form-select" id="light_conditions" name="light_conditions">
+            <option value="1" selected>Daylight</option>
+            <option value="4">Darkness - lights lit</option>
+            <option value="5">Darkness - lights unlit</option>
+            <option value="6">Darkness - no lighting</option>
+          </select>
+        </div>
+
+        <!-- Weather -->
+        <div class="form-group">
+          <label class="form-label">Weather Conditions</label>
+          <select class="form-select" id="weather_conditions" name="weather_conditions">
+            <option value="1" selected>Fine (No high winds)</option>
+            <option value="2">Raining (No high winds)</option>
+            <option value="3">Snowing</option>
+            <option value="4">Fine + High winds</option>
+            <option value="5">Raining + High winds</option>
+            <option value="7">Fog or mist</option>
+          </select>
+        </div>
+
+        <!-- Road Surface -->
+        <div class="form-group">
+          <label class="form-label">Road Surface Condition</label>
+          <select class="form-select" id="road_surface_conditions" name="road_surface_conditions">
+            <option value="1" selected>Dry</option>
+            <option value="2">Wet or damp</option>
+            <option value="3">Snow</option>
+            <option value="4">Frost or ice</option>
+            <option value="5">Flood (over 3cm)</option>
+          </select>
+        </div>
+
+        <!-- Urban/Rural -->
+        <div class="form-group">
+          <label class="form-label">Urban or Rural Area</label>
+          <select class="form-select" id="urban_or_rural_area" name="urban_or_rural_area">
+            <option value="1" selected>Urban Area</option>
+            <option value="2">Rural Area</option>
+          </select>
+        </div>
+
+        <!-- Number of Vehicles -->
+        <div class="form-group">
+          <label class="form-label">Number of Vehicles</label>
+          <input type="number" class="form-control" id="number_of_vehicles" name="number_of_vehicles" value="2" min="1" max="10">
+        </div>
+
+        <!-- Time / Hour -->
+        <div class="form-group">
+          <label class="form-label">Hour of Day (0–23)</label>
+          <select class="form-select" id="hour" name="hour">
+            {% for h in range(24) %}
+            <option value="{{ h }}" {% if h == 17 %}selected{% endif %}>{{ "%02d:00"|format(h) }} ({% if h in [8, 9, 17, 18] %}Peak Rush{% elif h in [22, 23, 0, 1, 2, 3] %}Night{% else %}Daytime{% endif %})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Day of Week -->
+        <div class="form-group">
+          <label class="form-label">Day of Week</label>
+          <select class="form-select" id="day_of_week" name="day_of_week">
+            <option value="2">Monday</option>
+            <option value="3">Tuesday</option>
+            <option value="4">Wednesday</option>
+            <option value="5">Thursday</option>
+            <option value="6" selected>Friday</option>
+            <option value="7">Saturday</option>
+            <option value="1">Sunday</option>
+          </select>
+        </div>
+
+        <!-- Road Class -->
+        <div class="form-group">
+          <label class="form-label">Road Classification</label>
+          <select class="form-select" id="first_road_class" name="first_road_class">
+            <option value="1">Motorway (M)</option>
+            <option value="3" selected>Major A-Road</option>
+            <option value="4">B-Road</option>
+            <option value="5">C-Road</option>
+            <option value="6">Unclassified Local Road</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-predict">
+        <i class="fa-solid fa-brain"></i>
+        <span>Generate Severity Prediction</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- Live Output Result Card -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-square-poll-vertical"></i> Real-Time Model Inference</span>
+      <span class="badge badge-info" id="predStatus">Awaiting Input</span>
+    </div>
+    <div class="card-subtitle">Output computed by the trained Balanced Random Forest Classifier.</div>
+
+    <div class="prediction-result-box" id="resultCard" style="display: none;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+        <span style="font-size: 0.85rem; color: #94a3b8; text-transform: uppercase;">Predicted Outcome</span>
+        <span class="badge" id="riskBadge">MODERATE RISK</span>
+      </div>
+
+      <div style="font-size: 1.6rem; font-weight: 700; color: #fff; margin-bottom: 12px;" id="predLabel">
+        Slight (Minor Injury)
+      </div>
+
+      <!-- Probability Bar -->
+      <div style="margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.82rem; color: #cbd5e1; margin-bottom: 6px;">
+          <span>Severe Probability: <strong id="severePct" style="color: #f87171;">28.5%</strong></span>
+          <span>Slight Probability: <strong id="slightPct" style="color: #34d399;">71.5%</strong></span>
+        </div>
+        <div style="width: 100%; height: 10px; background: rgba(52, 211, 153, 0.4); border-radius: 5px; overflow: hidden; display: flex;">
+          <div id="probBar" style="height: 100%; background: #ef4444; width: 28.5%; transition: width 0.4s ease;"></div>
+        </div>
+      </div>
+
+      <!-- Advisory Box -->
+      <div style="background: rgba(0, 0, 0, 0.25); border-left: 3px solid var(--accent-cyan); padding: 14px; border-radius: 6px; font-size: 0.85rem; color: #cbd5e1; line-height: 1.6;">
+        <strong>Safety Advisory:</strong> <span id="adviceText"></span>
+      </div>
+
+      <div style="margin-top: 18px; font-size: 0.75rem; color: #64748b;">
+        <i class="fa-solid fa-info-circle"></i> <strong>Academic Note:</strong> This output represents an empirical statistical prediction derived from 513,000 UK STATS19 collision records. It does not replace physical accident investigation.
+      </div>
+    </div>
+
+    <!-- Default Placeholder -->
+    <div id="placeholderCard" style="padding: 40px 20px; text-align: center; color: #64748b;">
+      <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.4;"></i>
+      <div style="font-size: 1rem; color: #cbd5e1; font-weight: 600;">Ready to Predict</div>
+      <p style="font-size: 0.82rem; margin-top: 6px;">Adjust parameters on the left and click "Generate Severity Prediction" to see real-time inference.</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.getElementById('predictionForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const payload = {
+      speed_limit: parseFloat(document.getElementById('speed_limit').value),
+      road_type: parseInt(document.getElementById('road_type').value),
+      light_conditions: parseInt(document.getElementById('light_conditions').value),
+      weather_conditions: parseInt(document.getElementById('weather_conditions').value),
+      road_surface_conditions: parseInt(document.getElementById('road_surface_conditions').value),
+      urban_or_rural_area: parseInt(document.getElementById('urban_or_rural_area').value),
+      number_of_vehicles: parseInt(document.getElementById('number_of_vehicles').value),
+      hour: parseInt(document.getElementById('hour').value),
+      day_of_week: parseInt(document.getElementById('day_of_week').value),
+      first_road_class: parseInt(document.getElementById('first_road_class').value)
+    };
+
+    document.getElementById('predStatus').textContent = "Inferencing...";
+    document.getElementById('predStatus').className = "badge badge-warning";
+
+    try {
+      const response = await fetch('/api/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const res = await response.json();
+
+      if (res.success) {
+        document.getElementById('placeholderCard').style.display = "none";
+        document.getElementById('resultCard').style.display = "block";
+
+        document.getElementById('predLabel').textContent = res.prediction_label;
+        document.getElementById('severePct').textContent = res.severe_probability + "%";
+        document.getElementById('slightPct').textContent = res.slight_probability + "%";
+        document.getElementById('probBar').style.width = res.severe_probability + "%";
+
+        const badge = document.getElementById('riskBadge');
+        badge.textContent = res.risk_level;
+        badge.className = "badge badge-" + res.badge_class;
+
+        document.getElementById('adviceText').textContent = res.advice;
+        document.getElementById('predStatus').textContent = "Model Inferred (200 OK)";
+        document.getElementById('predStatus').className = "badge badge-success";
+      } else {
+        alert("Prediction Error: " + res.error);
+      }
+    } catch (err) {
+      alert("Inference request failed: " + err);
+    }
+  });
+</script>
+{% endblock %}

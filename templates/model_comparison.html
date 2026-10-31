@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Model Comparison & Ensembles{% endblock %}
+{% block header_title %}Model Performance, Ensembles & Bias-Variance Analysis{% endblock %}
+
+{% block content %}
+<div class="callout">
+  <strong><i class="fa-solid fa-circle-check"></i> Core Principles:</strong> Bias-Variance Trade-off, Ensemble Learning, Bagging, Boosting, Random Forest, Feature Importance, Model Evaluation, and Master Comparative Synthesis.
+</div>
+
+<!-- Best Model Banner -->
+<div class="kpi-grid">
+  <div class="kpi-card" style="border-top: 3px solid #10b981;">
+    <div class="kpi-header">
+      <span class="kpi-title">Top Overall Classifier</span>
+      <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;"><i class="fa-solid fa-crown"></i></div>
+    </div>
+    <div class="kpi-value" style="color: #34d399; font-size: 1.5rem;">{{ data.best_model.model_name }}</div>
+    <div class="kpi-subtext">Weighted F1: <strong>{{ data.best_model.weighted_f1 }}</strong> | Accuracy: <strong>{{ "{:.2f}%".format(data.best_model.accuracy * 100) }}</strong></div>
+  </div>
+
+  <div class="kpi-card" style="border-top: 3px solid #00b4d8;">
+    <div class="kpi-header">
+      <span class="kpi-title">Top Ensemble Architecture</span>
+      <div class="kpi-icon"><i class="fa-solid fa-tree"></i></div>
+    </div>
+    <div class="kpi-value" style="color: var(--accent-cyan); font-size: 1.5rem;">Random Forest</div>
+    <div class="kpi-subtext">Highest ROC-AUC (<strong>0.6254</strong>) & Generalization Stability</div>
+  </div>
+
+  <div class="kpi-card" style="border-top: 3px solid #a78bfa;">
+    <div class="kpi-header">
+      <span class="kpi-title">Deep Learning Architecture</span>
+      <div class="kpi-icon"><i class="fa-solid fa-brain"></i></div>
+    </div>
+    <div class="kpi-value" style="color: #a78bfa; font-size: 1.5rem;">MLP Neural Net</div>
+    <div class="kpi-subtext">Accuracy: <strong>75.72%</strong> | ReLU Hidden Layers [64, 32]</div>
+  </div>
+</div>
+
+<!-- Master Leaderboard Table -->
+<div class="card panel-full" style="margin-bottom: 24px;">
+  <div class="card-title">
+    <span><i class="fa-solid fa-trophy"></i> Master Classification Leaderboard (All 9 Evaluated Algorithms)</span>
+    <span class="badge badge-info">Ranked by Weighted F1</span>
+  </div>
+  <div class="card-subtitle">Comprehensive cross-unit benchmark evaluated on identical 20,000 verified test incidents.</div>
+  
+  <div class="table-responsive">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Algorithm</th>
+          <th>Category</th>
+          <th>Accuracy</th>
+          <th>Precision (W)</th>
+          <th>Recall (W)</th>
+          <th>Weighted F1</th>
+          <th>ROC-AUC</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in data.master_leaderboard %}
+        <tr>
+          <td><strong>#{{ loop.index }}</strong></td>
+          <td>
+            <strong>{{ m.model_name }}</strong>
+            {% if loop.index == 1 %}<span class="badge badge-success" style="margin-left: 6px;">Rank 1</span>{% endif %}
+          </td>
+          <td>
+            <span class="badge {% if m.category == 'Ensemble' %}badge-success{% elif m.category == 'Neural Network' %}badge-purple{% else %}badge-info{% endif %}">
+              {{ m.category }}
+            </span>
+          </td>
+          <td>{{ "{:.2f}%".format(m.accuracy * 100) }}</td>
+          <td>{{ m.precision }}</td>
+          <td>{{ m.recall }}</td>
+          <td><strong style="color: {% if loop.index <= 3 %}#34d399{% else %}#fff{% endif %};">{{ m.weighted_f1 }}</strong></td>
+          <td>
+            {% if m.roc_auc %}
+              <span class="badge badge-info">{{ m.roc_auc }}</span>
+            {% else %}
+              <span style="color: #64748b;">N/A</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if m.model_name == 'Random Forest' %}
+              <span class="badge badge-success">Production Model</span>
+            {% else %}
+              <span class="badge badge-info">Benchmark</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Feature Importance & Ensemble Comparison -->
+<div class="panel-grid">
+  <!-- Feature Importance -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-chart-simple"></i> Random Forest Gini Feature Importance</span>
+      <span class="badge badge-success">MDI Weights</span>
+    </div>
+    <div class="card-subtitle">Quantifies reduction in Gini impurity contributed by each road predictor.</div>
+    <div style="height: 300px;">
+      <canvas id="importanceChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Ensemble Theoretical Framework -->
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-code-compare"></i> Ensemble Mechanisms: Bagging vs. Boosting</span>
+      <span class="badge badge-purple">Model Architecture</span>
+    </div>
+    <div class="card-subtitle">How ensemble techniques combine multiple models for superior stability.</div>
+    
+    <div style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.8; margin-top: 14px;">
+      <div style="margin-bottom: 12px; padding: 14px; background: rgba(56, 189, 248, 0.08); border-radius: 8px;">
+        <strong style="color: var(--accent-cyan); font-size: 0.95rem;">1. Bagging & Random Forest (Parallel Learning):</strong><br/>
+        Trains dozens of independent decision trees simultaneously on random bootstrap samples. At each branch, it picks a random subset of features to ensure individual trees are decorrelated. Averages all votes to drastically cut model variance and prevent overfitting.
+      </div>
+      <div style="padding: 14px; background: rgba(139, 92, 246, 0.08); border-radius: 8px;">
+        <strong style="color: #a78bfa; font-size: 0.95rem;">2. Gradient Boosting (Sequential Learning):</strong><br/>
+        Builds trees one after another in a sequential chain. Each new tree focuses specifically on learning from the mistakes and errors made by the previous trees, actively minimizing bias on difficult-to-predict severe accidents.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bias-Variance Tradeoff Analysis Table -->
+<div class="card panel-full">
+  <div class="card-title">
+    <span><i class="fa-solid fa-yin-yang"></i> Model Generalization: Bias-Variance Analysis</span>
+    <span class="badge badge-warning">Model Evaluation</span>
+  </div>
+  <div class="card-subtitle">Analysis of how different algorithm families balance underfitting (high bias) versus overfitting (high variance).</div>
+  
+  <div class="table-responsive">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Algorithm</th>
+          <th>Bias Level</th>
+          <th>Variance Level</th>
+          <th>Primary Overfitting / Underfitting Risk</th>
+          <th>Model Strengths & Practical Behavior</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in data.bias_variance_analysis %}
+        <tr>
+          <td><strong>{{ row.model }}</strong></td>
+          <td><span class="badge {% if row.bias == 'High' %}badge-danger{% else %}badge-success{% endif %}">{{ row.bias }}</span></td>
+          <td><span class="badge {% if row.variance == 'High' %}badge-danger{% else %}badge-info{% endif %}">{{ row.variance }}</span></td>
+          <td>{{ row.risk }}</td>
+          <td style="font-size: 0.82rem; color: #cbd5e1;">{{ row.viva_note }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Feature Importance Bar Chart
+  const featureImportance = {
+    "Number of Vehicles": 0.1966,
+    "Hour of Day": 0.1593,
+    "Road Type": 0.1223,
+    "Speed Limit": 0.1105,
+    "Day of Week": 0.1084,
+    "Road Surface": 0.0892,
+    "First Road Class": 0.0768,
+    "Light Conditions": 0.0542,
+    "Weather": 0.0461,
+    "Urban/Rural Area": 0.0366
+  };
+
+  new Chart(document.getElementById('importanceChart'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(featureImportance),
+      datasets: [{
+        label: 'Gini Importance',
+        data: Object.values(featureImportance),
+        backgroundColor: 'rgba(52, 211, 153, 0.65)',
+        borderColor: '#10b981',
+        borderWidth: 1.5,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#243356' }, ticks: { color: '#94a3b8' } },
+        y: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { size: 11 } } }
+      }
+    }
+  });
+</script>
+{% endblock %}

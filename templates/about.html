@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}About & Syllabus Mapping{% endblock %}
+{% block header_title %}Academic Syllabus Mapping & Viva Defense Guide{% endblock %}
+
+{% block content %}
+<div class="callout">
+  <strong><i class="fa-solid fa-graduation-cap"></i> Academic Project Alignment:</strong> This project was engineered for a BTech Computer Science curriculum under the <strong>Predictive Analytics</strong> course, rigorously satisfying the practical experimental requirements across all six syllabus units using empirical UK Government STATS19 open data.
+</div>
+
+<!-- Project Overview Card -->
+<div class="card panel-full" style="margin-bottom: 24px;">
+  <div class="card-title">
+    <span><i class="fa-solid fa-circle-info"></i> Project Abstract & Specification</span>
+    <span class="badge badge-success">BTech CSE Major Project</span>
+  </div>
+  <div class="card-subtitle">Road Accident Prediction and Analytics Dashboard Using Machine Learning</div>
+  <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.7;">
+    This system establishes an end-to-end predictive analytics framework on <strong>513,801 official collision records (2021–2025)</strong> published by the UK Department for Transport (DfT). Rather than relying on synthetic or toy datasets, it addresses real-world machine learning challenges including high-dimensional categorical encoding, special missing-value flags (<code>-1</code>), acute target class imbalance (1.8% fatal vs. 75.8% slight), spatial auto-correlation, and multicollinearity.
+  </p>
+</div>
+
+<!-- Syllabus Mapping Table -->
+<div class="card panel-full" style="margin-bottom: 24px;">
+  <div class="card-title">
+    <span><i class="fa-solid fa-list-check"></i> Complete 6-Unit Syllabus Mapping</span>
+    <span class="badge badge-info">100% Curriculum Coverage</span>
+  </div>
+  <div class="card-subtitle">Exact correspondence between theoretical syllabus topics and actual code implementations.</div>
+
+  <div class="table-responsive">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Syllabus Unit</th>
+          <th>Prescribed Curriculum Topics</th>
+          <th>Actual Project Implementation</th>
+          <th>Algorithms / Methods</th>
+          <th>Website Module</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Unit I: Intro & Data Prep</strong></td>
+          <td>Data Preprocessing, Missing-value handling, Outlier inspection, Categorical encoding, EDA</td>
+          <td>Chunk-based parsing of 1.46 GB STATS19 CSV; handling <code>-1</code> codes; datetime feature extraction; stratified train/test split.</td>
+          <td>Pandas, NumPy, StandardScaler</td>
+          <td><code>/dataset</code></td>
+          <td><span class="badge badge-success">Fully Covered</span></td>
+        </tr>
+        <tr>
+          <td><strong>Unit II: Regression</strong></td>
+          <td>Simple & Multiple Linear Regression, Polynomial Regression, OLS, Correlation, MAE, MSE, RMSE, $R^2$</td>
+          <td>Monthly nationwide collision count prediction based on traffic throughput, casualty volume, and regional speed limits.</td>
+          <td>SLR, MLR, Polynomial Regression (Deg 2)</td>
+          <td><code>/regression</code></td>
+          <td><span class="badge badge-success">Fully Covered</span></td>
+        </tr>
+        <tr>
+          <td><strong>Unit III: Classification</strong></td>
+          <td>KNN, Naive Bayes, Decision Trees, SVM, Logistic Regression, Accuracy, Precision, Recall, F1, Confusion Matrix, ROC-AUC</td>
+          <td>Predicting crash severity (Severe [Fatal/Serious] vs Slight) with class imbalance penalization matrix.</td>
+          <td>Logistic Reg, Gaussian NB, KNN, Decision Tree, SVM, Random Forest, HistGradientBoosting</td>
+          <td><code>/classification</code></td>
+          <td><span class="badge badge-success">Fully Covered</span></td>
+        </tr>
+        <tr>
+          <td><strong>Unit IV: Clustering & Patterns</strong></td>
+          <td>K-Means, Random Init, Selecting K, Elbow Method, Silhouette Score, Hierarchical Clustering (Ward/Linkage), Association Rules</td>
+          <td>Unsupervised discovery of crash archetypes (Urban Commuter vs Rural High-Speed vs Adverse Weather); frequent condition itemset mining.</td>
+          <td>K-Means ($k=2..6$), Agglomerative Clustering, PCA 2D Cluster Projection</td>
+          <td><code>/clustering</code></td>
+          <td><span class="badge badge-success">Fully Covered</span></td>
+        </tr>
+        <tr>
+          <td><strong>Unit V: PCA & Neural Networks</strong></td>
+          <td>Dimensionality Reduction, Principal Component Analysis, Scree Plot, Explained Variance, Feedforward Neural Networks, MLP</td>
+          <td>Eigenvalue decomposition of 10 road features; model comparison before vs after PCA; Multi-Layer Perceptron (ReLU, Adam, Early stopping).</td>
+          <td>PCA (3 components), MLPClassifier (64-32 architecture)</td>
+          <td><code>/pca-nn</code></td>
+          <td><span class="badge badge-success">Fully Covered</span></td>
+        </tr>
+        <tr>
+          <td><strong>Unit VI: Model Performance & Ensembles</strong></td>
+          <td>Bias-Variance Trade-off, Ensemble Learning, Bagging, Random Forest, Boosting, Model Evaluation</td>
+          <td>Master comparison of all 9 models; Gini feature importances; theoretical bias-variance analysis matrix.</td>
+          <td>BaggingClassifier, RandomForestClassifier, GradientBoostingClassifier</td>
+          <td><code>/model-comparison</code></td>
+          <td><span class="badge badge-success">Fully Covered</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Academic Viva Questions & Defense Guide -->
+<div class="card panel-full" style="margin-bottom: 24px;">
+  <div class="card-title">
+    <span><i class="fa-solid fa-chalkboard-user"></i> Academic Viva Defense & Examination Guide</span>
+    <span class="badge badge-warning">Frequently Asked Viva Questions</span>
+  </div>
+  <div class="card-subtitle">Key theoretical explanations to defend your project before college examiners.</div>
+
+  <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 14px;">
+    <!-- Q1 -->
+    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 18px;">
+      <h3 style="color: var(--accent-cyan); font-size: 0.95rem; margin-bottom: 8px;">
+        Q1: Why did you aggregate accident counts by month for Regression instead of running regression on raw collision rows?
+      </h3>
+      <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.6;">
+        <strong>Answer:</strong> On individual collision rows, accident severity is discrete and ordinal (Fatal=1, Serious=2, Slight=3). Treating these codes as continuous real numbers in linear regression would violate regression assumptions (homoscedasticity and normality of residuals) and imply equal metric distances between categories. Aggregating counts by month provides a continuous, non-negative target ($Y \in \mathbb{R}^+$) suitable for Ordinary Least Squares (OLS) and Polynomial regression.
+      </p>
+    </div>
+
+    <!-- Q2 -->
+    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 18px;">
+      <h3 style="color: var(--accent-cyan); font-size: 0.95rem; margin-bottom: 8px;">
+        Q2: How did you address the extreme class imbalance in accident severity?
+      </h3>
+      <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.6;">
+        <strong>Answer:</strong> Fatal and serious injuries represent ~24% while slight injuries represent ~76%. If evaluated purely on raw Accuracy, a naive model predicting "Slight" would achieve 76% accuracy but fail on all fatal collisions. We implemented <code>class_weight='balanced'</code> across Logistic Regression, Decision Trees, and Random Forests, which applies cost-sensitive penalty weights inversely proportional to class frequencies ($w_j = \frac{N}{k \cdot n_j}$), and benchmarked models on <strong>Weighted F1-score and ROC-AUC</strong>.
+      </p>
+    </div>
+
+    <!-- Q3 -->
+    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 18px;">
+      <h3 style="color: var(--accent-cyan); font-size: 0.95rem; margin-bottom: 8px;">
+        Q3: What is the fundamental difference between Bagging and Boosting in your ensemble experiments?
+      </h3>
+      <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.6;">
+        <strong>Answer:</strong> Bagging (Bootstrap Aggregating) trains base estimators in parallel on independent bootstrap samples to <strong>reduce model variance</strong> without increasing bias. Random Forest enhances this with random feature subspace selection. In contrast, Gradient Boosting trains base estimators sequentially, where each new tree fits the pseudo-residuals of the prior ensemble to <strong>reduce bias</strong>.
+      </p>
+    </div>
+
+    <!-- Q4 -->
+    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 18px;">
+      <h3 style="color: var(--accent-cyan); font-size: 0.95rem; margin-bottom: 8px;">
+        Q4: How did Principal Component Analysis (PCA) impact classification performance?
+      </h3>
+      <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.6;">
+        <strong>Answer:</strong> PCA performed orthogonal linear transformation to project 10 standardized road features into uncorrelated principal components. The top 3 components preserved ~40% of overall variance. Evaluating Logistic Regression before vs. after reduction demonstrated that the 3-component model retained ~98% of the baseline F1-score while compressing feature dimensionality by 70%, proving effective redundancy elimination.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Project Limitations & Future Scope -->
+<div class="panel-grid">
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-triangle-exclamation"></i> Academic Project Limitations</span>
+      <span class="badge badge-warning">Critical Reflection</span>
+    </div>
+    <div style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.7; margin-top: 10px;">
+      <ul style="padding-left: 18px;">
+        <li><strong>Unreported Accidents:</strong> Minor property-damage-only collisions without police attendance are excluded from STATS19.</li>
+        <li><strong>Driver Behavior:</strong> Real-time telematics (telecom distraction, BAC levels, micro-sleep) are not available as continuous sensor features.</li>
+        <li><strong>Static Speed Limits:</strong> Posted speed limits were recorded rather than dynamic GPS vehicle velocity at moment of impact.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span><i class="fa-solid fa-rocket"></i> Future Engineering Scope</span>
+      <span class="badge badge-info">Next Steps</span>
+    </div>
+    <div style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.7; margin-top: 10px;">
+      <ul style="padding-left: 18px;">
+        <li><strong>Deep Spatial Graph Neural Networks (GNN):</strong> Modeling UK road networks as topological graphs (nodes = intersections, edges = road links).</li>
+        <li><strong>Live Meteorological API Integration:</strong> Feeding real-time OpenWeather precipitation radar into the interactive inference pipeline.</li>
+        <li><strong>Automated Emergency Dispatch Optimization:</strong> Priority routing algorithms for trauma helicopter response based on predicted severity probabilities.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

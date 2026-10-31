@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Accident Heatmap{% endblock %}
+{% block header_title %}Accident Heatmap & Density Analysis{% endblock %}
+
+{% block content %}
+<!-- Section 1: Geographical Heatmap Map -->
+<div class="card panel-full" style="margin-bottom: 24px;">
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 16px;">
+    <div>
+      <div style="font-size: 1.15rem; font-weight: 700; color: #fff;">
+        <i class="fa-solid fa-map-location-dot" style="color: #00b4d8;"></i> UK Geographical Accident Density Heatmap
+      </div>
+      <div style="font-size: 0.82rem; color: #94a3b8; margin-top: 4px;">
+        Powered by CARTO Dark Matter Basemaps. High-density heat cloud revealing nationwide collision concentrations.
+      </div>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div style="display: flex; flex-wrap: wrap; gap: 8px;" id="filterButtons">
+      <button class="badge-tag active-filter" onclick="filterHeatmap('all')" id="btn-all" style="cursor: pointer; border: none;">
+        🔥 All Collisions
+      </button>
+      <button class="badge-tag" onclick="filterHeatmap('Fatal')" id="btn-fatal" style="cursor: pointer; border: none; background: rgba(239, 68, 68, 0.2); color: #f87171;">
+        💀 Fatal Crashes
+      </button>
+      <button class="badge-tag" onclick="filterHeatmap('Serious')" id="btn-serious" style="cursor: pointer; border: none; background: rgba(245, 158, 11, 0.2); color: #fbbf24;">
+        🏥 Serious Injuries
+      </button>
+      <button class="badge-tag" onclick="filterHeatmap('wet')" id="btn-wet" style="cursor: pointer; border: none; background: rgba(56, 189, 248, 0.2); color: #38bdf8;">
+        🌧️ Wet Roads
+      </button>
+      <button class="badge-tag" onclick="filterHeatmap('night')" id="btn-night" style="cursor: pointer; border: none; background: rgba(139, 92, 246, 0.2); color: #c084fc;">
+        🌙 Nighttime
+      </button>
+    </div>
+  </div>
+
+  <!-- Heatmap Parameter Sliders -->
+  <div style="display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 16px; padding: 12px 16px; background: rgba(255, 255, 255, 0.02); border-radius: 8px; font-size: 0.82rem; color: #cbd5e1;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span>Heat Radius:</span>
+      <input type="range" id="radiusSlider" min="10" max="40" value="22" oninput="updateHeatParams()" style="cursor: pointer;">
+      <span id="radiusVal" style="color: var(--accent-cyan); font-weight: 600;">22px</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span>Heat Blur:</span>
+      <input type="range" id="blurSlider" min="10" max="35" value="18" oninput="updateHeatParams()" style="cursor: pointer;">
+      <span id="blurVal" style="color: var(--accent-cyan); font-weight: 600;">18px</span>
+    </div>
+
+    <div style="margin-left: auto; color: #94a3b8;">
+      Rendering <strong id="pointCountDisplay" style="color: #fff;">2,000</strong> sample points
+    </div>
+  </div>
+
+  <!-- Map Container -->
+  <div id="full-uk-heatmap" style="width: 100%; height: 500px; border-radius: 8px; border: 1px solid var(--border-color);"></div>
+</div>
+
+<!-- Section 2: Data Science Matrix Heatmap (Day of Week vs. Hour of Day) -->
+<div class="card panel-full" style="margin-bottom: 24px;">
+  <div class="card-title">
+    <span><i class="fa-solid fa-table-cells" style="color: #f97316;"></i> Time Series Heatmap: Collisions by Day of Week vs. Hour of Day</span>
+    <span class="badge badge-warning">168 Matrix Cells (7 Days &times; 24 Hours)</span>
+  </div>
+  <div class="card-subtitle">
+    Classic data science cross-tabulation heatmap. Each cell's color intensity reflects total collision density. Hover over any cell to view exact numbers.
+  </div>
+
+  <div class="matrix-container">
+    <!-- Header: Hours 00 to 23 -->
+    <div class="matrix-header-row" style="grid-template-columns: 100px repeat(24, 1fr);">
+      <div class="matrix-header-cell" style="text-align: right; padding-right: 12px;">Day / Hour</div>
+      {% for h in matrix_data.temporal_heatmap.hours %}
+      <div class="matrix-header-cell">{{ h[:2] }}</div>
+      {% endfor %}
+    </div>
+
+    <!-- Rows: Monday to Sunday -->
+    {% set min_val = matrix_data.temporal_heatmap.min %}
+    {% set max_val = matrix_data.temporal_heatmap.max %}
+    {% for day in matrix_data.temporal_heatmap.days %}
+    {% set day_idx = loop.index0 %}
+    <div style="display: grid; grid-template-columns: 100px repeat(24, 1fr); gap: 3px; margin-bottom: 3px;">
+      <div class="matrix-label-col">{{ day }}</div>
+      {% for val in matrix_data.temporal_heatmap.matrix[day_idx] %}
+        {% set ratio = (val - min_val) / (max_val - min_val) %}
+        {% if ratio < 0.2 %}
+          {% set bg_col = "rgba(14, 116, 144, " ~ (0.2 + ratio * 2) ~ ")" %}
+        {% elif ratio < 0.5 %}
+          {% set bg_col = "rgba(16, 185, 129, " ~ (0.4 + ratio) ~ ")" %}
+        {% elif ratio < 0.8 %}
+          {% set bg_col = "rgba(245, 158, 11, " ~ (0.6 + ratio * 0.4) ~ ")" %}
+        {% else %}
+          {% set bg_col = "rgba(239, 68, 68, " ~ (0.75 + ratio * 0.25) ~ ")" %}
+        {% endif %}
+        <div class="matrix-cell" style="background-color: {{ bg_col }};" title="{{ day }} at {{ '%02d:00'|format(loop.index0) }}: {{ val }} collisions">
+          {{ val }}
+        </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+
+    <!-- Legend -->
+    <div class="matrix-legend">
+      <span>Low Density ({{ min_val }} collisions)</span>
+      <div class="matrix-legend-bar" style="background: linear-gradient(90deg, rgba(14, 116, 144, 0.4), rgba(16, 185, 129, 0.7), rgba(245, 158, 11, 0.8), rgba(239, 68, 68, 1));"></div>
+      <span>High Density ({{ max_val }} collisions — Peak: Friday 17:00)</span>
+    </div>
+  </div>
+</div>
+
+<!-- Section 3: Feature Correlation Matrix Heatmap -->
+<div class="card panel-full">
+  <div class="card-title">
+    <span><i class="fa-solid fa-braille" style="color: #a78bfa;"></i> Correlation Matrix Heatmap (Pearson r)</span>
+    <span class="badge badge-purple">Feature Collinearity</span>
+  </div>
+  <div class="card-subtitle">
+    Square matrix heatmap illustrating linear dependencies between core vehicular, environmental, and outcome variables.
+  </div>
+
+  <div class="matrix-container" style="max-width: 800px; margin: 0 auto;">
+    <!-- Correlation Header -->
+    <div style="display: grid; grid-template-columns: 120px repeat(7, 1fr); gap: 4px; margin-bottom: 4px;">
+      <div></div>
+      {% for feat in matrix_data.correlation_heatmap.features %}
+      <div style="font-size: 0.72rem; font-weight: 700; color: #94a3b8; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ feat }}">
+        {{ feat }}
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Correlation Rows -->
+    {% for f_row in matrix_data.correlation_heatmap.features %}
+    {% set row_idx = loop.index0 %}
+    <div style="display: grid; grid-template-columns: 120px repeat(7, 1fr); gap: 4px; margin-bottom: 4px;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; white-space: nowrap;">
+        {{ f_row }}
+      </div>
+      {% for val in matrix_data.correlation_heatmap.matrix[row_idx] %}
+        {% if val == 1.0 %}
+          {% set bg_corr = "#ef4444" %}
+        {% elif val > 0.4 %}
+          {% set bg_corr = "rgba(239, 68, 68, " ~ val ~ ")" %}
+        {% elif val > 0 %}
+          {% set bg_corr = "rgba(249, 115, 22, " ~ (val * 1.5 + 0.15) ~ ")" %}
+        {% elif val < -0.1 %}
+          {% set bg_corr = "rgba(59, 130, 246, " ~ (-val * 1.5 + 0.2) ~ ")" %}
+        {% else %}
+          {% set bg_corr = "rgba(30, 41, 59, 0.6)" %}
+        {% endif %}
+        <div class="matrix-cell" style="background-color: {{ bg_corr }}; height: 42px; font-size: 0.78rem;" title="{{ f_row }} vs {{ matrix_data.correlation_heatmap.features[loop.index0] }}: r = {{ val }}">
+          {{ val }}
+        </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+
+    <!-- Legend -->
+    <div class="matrix-legend" style="justify-content: center; margin-top: 16px;">
+      <span style="color: #60a5fa;">Negative Correlation (-1.0)</span>
+      <div class="matrix-legend-bar" style="background: linear-gradient(90deg, #3b82f6, #1e293b, #ef4444);"></div>
+      <span style="color: #f87171;">Positive Correlation (+1.0)</span>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let allPoints = [];
+  let currentFilter = 'all';
+  let heatLayer = null;
+  let markerLayer = null;
+
+  const cartoApiKey = "cb1_4z5r_1_e0afd38c87c9d26c3bc1ff61";
+  const cartoTileUrl = `https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png?key=${cartoApiKey}`;
+
+  const map = L.map('full-uk-heatmap').setView([54.5, -2.5], 6);
+
+  L.tileLayer(cartoTileUrl, {
+    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap contributors',
+    maxZoom: 18,
+    subdomains: 'abcd'
+  }).addTo(map);
+
+  fetch('/api/map-points')
+    .then(res => res.json())
+    .then(points => {
+      allPoints = points;
+      renderHeatmap();
+    });
+
+  function renderHeatmap() {
+    if (heatLayer) map.removeLayer(heatLayer);
+    if (markerLayer) map.removeLayer(markerLayer);
+
+    let filtered = allPoints;
+    if (currentFilter === 'Fatal') {
+      filtered = allPoints.filter(p => p.severity_label === 'Fatal');
+    } else if (currentFilter === 'Serious') {
+      filtered = allPoints.filter(p => p.severity_label === 'Serious');
+    } else if (currentFilter === 'wet') {
+      filtered = allPoints.filter(p => p.weather_label && p.weather_label.toLowerCase().includes('rain'));
+    } else if (currentFilter === 'night') {
+      filtered = allPoints.filter(p => p.light_label && p.light_label.toLowerCase().includes('darkness'));
+    }
+
+    document.getElementById('pointCountDisplay').textContent = filtered.length.toLocaleString();
+
+    const heatData = filtered.map(pt => [
+      pt.latitude,
+      pt.longitude,
+      pt.severity_label === 'Fatal' ? 1.0 : (pt.severity_label === 'Serious' ? 0.75 : 0.4)
+    ]);
+
+    const radius = parseInt(document.getElementById('radiusSlider').value);
+    const blur = parseInt(document.getElementById('blurSlider').value);
+
+    heatLayer = L.heatLayer(heatData, {
+      radius: radius,
+      blur: blur,
+      maxZoom: 13,
+      max: 1.0,
+      gradient: {
+        0.2: '#00b4d8',
+        0.4: '#34d399',
+        0.6: '#facc15',
+        0.8: '#f97316',
+        1.0: '#ef4444'
+      }
+    }).addTo(map);
+
+    markerLayer = L.layerGroup();
+    const highlightSample = filtered.filter(p => p.severity_label === 'Fatal' || p.severity_label === 'Serious').slice(0, 150);
+
+    highlightSample.forEach(pt => {
+      const color = pt.severity_label === 'Fatal' ? '#ef4444' : '#f59e0b';
+      L.circleMarker([pt.latitude, pt.longitude], {
+        radius: pt.severity_label === 'Fatal' ? 6 : 4,
+        fillColor: color,
+        color: '#fff',
+        weight: 1,
+        fillOpacity: 0.85
+      }).bindPopup(`
+        <div style="font-size: 12px; color: #111;">
+          <strong>Severity: ${pt.severity_label}</strong><br/>
+          Speed Limit: ${pt.speed_limit} mph<br/>
+          Weather: ${pt.weather_label || 'Fine'}<br/>
+          Year: ${pt.collision_year}
+        </div>
+      `).addTo(markerLayer);
+    });
+
+    markerLayer.addTo(map);
+  }
+
+  function filterHeatmap(filterType) {
+    currentFilter = filterType;
+    document.querySelectorAll('#filterButtons button').forEach(b => b.classList.remove('active-filter'));
+    const btn = document.getElementById('btn-' + filterType.toLowerCase());
+    if (btn) btn.classList.add('active-filter');
+    renderHeatmap();
+  }
+
+  function updateHeatParams() {
+    const r = document.getElementById('radiusSlider').value;
+    const b = document.getElementById('blurSlider').value;
+    document.getElementById('radiusVal').textContent = r + 'px';
+    document.getElementById('blurVal').textContent = b + 'px';
+    if (heatLayer) {
+      heatLayer.setOptions({ radius: parseInt(r), blur: parseInt(b) });
+    }
+  }
+</script>
+
+<style>
+  .active-filter {
+    box-shadow: 0 0 0 2px var(--accent-cyan);
+    font-weight: 700 !important;
+  }
+</style>
+{% endblock %}
